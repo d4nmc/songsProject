@@ -14,9 +14,9 @@ const SONGNAME = document.querySelector("#songName");
 const ARTISTNAME = document.querySelector("#artistName");
 const YEARRELEASED = document.querySelector("#yearReleased");
 const SONGGENRE = document.querySelector("#songGenre");
-const GOTBASS = document.querySelector("gotBass");
+const GOTBASS = document.querySelector("#gotBass");
 const DIV = document.querySelector("#responsefromdb");
-let submitButton = document.querySelector("#subBtn");
+let submitBTN = document.querySelector("#subBTN");
 
 // READ
 
@@ -25,7 +25,7 @@ let readBTN = document.querySelector("#readBTN");
 // DELETE
 
 const DELETEID = document.querySelector("#deleteID");
-let delBTN = document.querySelector("#delBtn");
+let deleteBTN = document.querySelector("#delBtn");
 
 // UPDATE 
 
@@ -34,7 +34,7 @@ const UPARTISTNAME = document.querySelector("#upartistName");
 const UPYEARRELEASED = document.querySelector("#upyearReleased");
 const UPDIV = document.querySelector("#responsefromdb");
 const UPDATEID = document.querySelector("#updateID");
-let updateBTN = document.querySelector("#updatebBTN");
+let updateBTN = document.querySelector("#updateBTN");
 
 // CREATE THE CUSTOM BIT
 const printToScreen = (msg) => {
@@ -46,51 +46,53 @@ const printToScreen = (msg) => {
 }
 
 // CREATE THE SONG METHOD F
-const createSong = (a) => {
-    a.preventdefault();
+const createSong = (e) => {
+    e.preventDefault();
 
-    const SONGNAME_VALUE= SONGNAME.value;
-    const ARTISTNAME_VALUE= ARTISTNAME.vlaue;
-    const YEARRELEASED_VALUE= YEARRELEASED.value;
-    const SONGGENRE_VALUE= SONGGENRE.value;
-    const GOTBASS_VALUE= GOTBASS.value;
-    console.log(SONGNAME_VALUE,ARTISTNAME_VALUE,YEARRELEASED_VALUE,SONGGENRE_VALUE,GOTBASS_VALUE)
+    const SONGNAME_VALUE = SONGNAME.value;
+    const ARTISTNAME_VALUE = ARTISTNAME.value;
+    const YEARRELEASED_VALUE = YEARRELEASED.value;
+    const SONGGENRE_VALUE = SONGGENRE.value;
+    const GOTBASS_VALUE = GOTBASS.value;
+    console.log(SONGNAME_VALUE, ARTISTNAME_VALUE, YEARRELEASED_VALUE, SONGGENRE_VALUE, GOTBASS_VALUE)
 
+
+
+    let data = {
+        songName: SONGNAME_VALUE,
+        artistName: ARTISTNAME_VALUE,
+        yearReleased: YEARRELEASED_VALUE,
+        songGenre: SONGGENRE_VALUE,
+        gotBass: GOTBASS_VALUE
+    }
+    axios.post('http://localhost:9092/songs/create', data, {
+        Headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+        .then((response) => printToScreen("Song Addded!"))
+        .catch((error) => printToScreen(error));
 }
-
-let data = {
-    songName: SONGNAME_VALUE,
-    artistName: ARTISTNAME_VALUE,
-    yearReleased: YEARRELEASED_VALUE,
-    songGenre: SONGGENRE_VALUE,
-    gotBass: GOTBASS_VALUE
-}
-axios.post(`http://localhost:8080/songs/createSong`, data, {
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-    }})
-    .then((response) => printToScreen("Song Addded!"))
-    .catch((error) => printToScreen("Something went wrong!"));
-
 
 // READ METHOD
 
-
 const readSong = (e) => {
     e.preventDefault();
-    axios.get(`http://localhost:8080/songs/read/`, {
-headers: {
-  'Access-Control-Allow-Origin': '*',
-}})
-.then((response) => { 
-  
-for(let entry in response.data){
+    axios.get('http://localhost:9092/songs/read/', {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+        .then((response) => {
 
-printToScreen(JSON.stringify(response.data[entry].songName));
+            for (let entry in response.data) {
 
-}})
+                printToScreen(JSON.stringify(response.data[entry].songName));
 
-.catch((error) => printToScreen("Something has went wrong, try again"));
+            }
+        })
+
+        .catch((error) => printToScreen("Something has went wrong, try again"));
 }
 
 // UPDATE METHOD
@@ -105,7 +107,7 @@ const updateSong = (b) => {
     const GOTBASS_VALUE = UPGOTBASS.VALUE;
     const UPDATEID_VALUE = Number(UPDATEID.value);
 
-    console.log(SONGNAME_VALUE,ARTISTNAME_VALUE,YEARRELEASED_VALUE,SONGGENRE_VALUE,GOTBASS_VALUE, UPDATEID_VALUE);
+    console.log(SONGNAME_VALUE, ARTISTNAME_VALUE, YEARRELEASED_VALUE, SONGGENRE_VALUE, GOTBASS_VALUE, UPDATEID_VALUE);
 
     let data = {
         songName: SONGNAME_VALUE,
@@ -115,28 +117,27 @@ const updateSong = (b) => {
         gotBass: GOTBASS_VALUE
     }
 
-   
-axios.put(`http://localhost:8080/songs/updateSong/${UPDATEID_VALUE}`, data, {
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-    }})
-    .then((response) => printToScreen("Song details have been changed"))
-    .catch((error) =>  printToScreen("Something has went wrong, try again"));
+
+    axios.put('http://localhost:9092/songs/replace/${UPDATEID_VALUE}', data, {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+        }
+    })
+        .then((response) => printToScreen("Song details have been changed"))
+        .catch((error) => printToScreen("Something has went wrong, try again"));
 
 }
 
+// delete the song method
 
-
- // delete the song method
- 
 
 const deleteSong = () => {
 
 
     const DELID = Number(DELETEID.value);
 
-    axios.delete(`http://localhost:8080/songs/delete/${DELID}`, {
-        headers:{
+    axios.delete('http://localhost:9092/songs/delete/${DELID}', {
+        headers: {
             'Access-Control-Allow-Origin': '*'
         }
     })
@@ -144,9 +145,7 @@ const deleteSong = () => {
         .catch((error) => printToScreen("Something went wrong there, try again"));
 }
 
-
-
-submitButton.addEventListener(`click`,createSong);
-readBTN.addEventListener(`click`, readSong);
-updateBTN.addEventListener(`click`, updateSong);
-deleteBTN.addEventListener(`click`, deleteSong);
+submitBTN.addEventListener('click', createSong);
+readBTN.addEventListener('click', readSong);
+updateBTN.addEventListener('click', updateSong);
+deleteBTN.addEventListener('click', deleteSong);
