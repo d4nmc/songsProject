@@ -1,0 +1,152 @@
+`use strict`
+
+// // heading
+
+// let newHeading = document.createElement("h1");
+// let headingText = document.createTextNode("Playlist");
+// let playlistHeading = document.querySelector("#playListHeading");
+// newHeading.apendChild(headingText);
+// playlistHeading.appendChild(newHeading);
+
+// CREATE
+
+const SONGNAME = document.querySelector("#songName");
+const ARTISTNAME = document.querySelector("#artistName");
+const YEARRELEASED = document.querySelector("#yearReleased");
+const SONGGENRE = document.querySelector("#songGenre");
+const GOTBASS = document.querySelector("gotBass");
+const DIV = document.querySelector("#responsefromdb");
+let submitButton = document.querySelector("#subBtn");
+
+// READ
+
+let readBTN = document.querySelector("#readBTN");
+
+// DELETE
+
+const DELETEID = document.querySelector("#deleteID");
+let delBTN = document.querySelector("#delBtn");
+
+// UPDATE 
+
+const UPSONGNAME = document.querySelector("#upsongName");
+const UPARTISTNAME = document.querySelector("#upartistName");
+const UPYEARRELEASED = document.querySelector("#upyearReleased");
+const UPDIV = document.querySelector("#responsefromdb");
+const UPDATEID = document.querySelector("#updateID");
+let updateBTN = document.querySelector("#updatebBTN");
+
+// CREATE THE CUSTOM BIT
+const printToScreen = (msg) => {
+    const P = document.createElement("p");
+    const TEXT = document.createTextNode(msg);
+
+    P.appendChild(TEXT);
+    DIV.appendChild(P);
+}
+
+// CREATE THE SONG METHOD F
+const createSong = (a) => {
+    a.preventdefault();
+
+    const SONGNAME_VALUE= SONGNAME.value;
+    const ARTISTNAME_VALUE= ARTISTNAME.vlaue;
+    const YEARRELEASED_VALUE= YEARRELEASED.value;
+    const SONGGENRE_VALUE= SONGGENRE.value;
+    const GOTBASS_VALUE= GOTBASS.value;
+    console.log(SONGNAME_VALUE,ARTISTNAME_VALUE,YEARRELEASED_VALUE,SONGGENRE_VALUE,GOTBASS_VALUE)
+
+}
+
+let data = {
+    songName: SONGNAME_VALUE,
+    artistName: ARTISTNAME_VALUE,
+    yearReleased: YEARRELEASED_VALUE,
+    songGenre: SONGGENRE_VALUE,
+    gotBass: GOTBASS_VALUE
+}
+axios.post(`http://localhost:8080/songs/createSong`, data, {
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+    }})
+    .then((response) => printToScreen("Song Addded!"))
+    .catch((error) => printToScreen("Something went wrong!"));
+
+
+// READ METHOD
+
+
+const readSong = (e) => {
+    e.preventDefault();
+    axios.get(`http://localhost:8080/songs/read/`, {
+headers: {
+  'Access-Control-Allow-Origin': '*',
+}})
+.then((response) => { 
+  
+for(let entry in response.data){
+
+printToScreen(JSON.stringify(response.data[entry].songName));
+
+}})
+
+.catch((error) => printToScreen("Something has went wrong, try again"));
+}
+
+// UPDATE METHOD
+
+const updateSong = (b) => {
+    b.preventDefault();
+
+    const SONGNAME_VALUE = UPSONGNAME.value;
+    const ARTISTNAME_VALUE = UPARTISTNAME.value;
+    const UPYEARRELEASED_VALUE = UPYEARRELEASED.value;
+    const SONGGENRE_VALUE = UPSONGGENRE.value;
+    const GOTBASS_VALUE = UPGOTBASS.VALUE;
+    const UPDATEID_VALUE = Number(UPDATEID.value);
+
+    console.log(SONGNAME_VALUE,ARTISTNAME_VALUE,YEARRELEASED_VALUE,SONGGENRE_VALUE,GOTBASS_VALUE, UPDATEID_VALUE);
+
+    let data = {
+        songName: SONGNAME_VALUE,
+        artistName: ARTISTNAME_VALUE,
+        yearReleased: YEARRELEASED_VALUE,
+        songGenre: SONGGENRE_VALUE,
+        gotBass: GOTBASS_VALUE
+    }
+
+   
+axios.put(`http://localhost:8080/songs/updateSong/${UPDATEID_VALUE}`, data, {
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+    }})
+    .then((response) => printToScreen("Song details have been changed"))
+    .catch((error) =>  printToScreen("Something has went wrong, try again"));
+
+}
+
+
+
+ // delete the song method
+ 
+
+const deleteSong = () => {
+
+
+    const DELID = Number(DELETEID.value);
+
+    axios.delete(`http://localhost:8080/songs/delete/${DELID}`, {
+        headers:{
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+        .then((response) => printToScreen("The chosen song has been deleted"))
+        .catch((error) => printToScreen("Something went wrong there, try again"));
+}
+
+
+
+submitButton.addEventListener(`click`,createSong);
+readBTN.addEventListener(`click`, readSong);
+updateBTN.addEventListener(`click`, updateSong);
+deleteBTN.addEventListener(`click`, deleteSong);
